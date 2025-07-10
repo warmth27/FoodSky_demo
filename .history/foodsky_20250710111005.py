@@ -374,7 +374,7 @@ def cal_food_nutri(all_food_name):
     return total_nutrition_all
 
 
-#! 生成推荐理由 Foodsky
+#! 
 
 
 # 线性规划实现菜品选择
