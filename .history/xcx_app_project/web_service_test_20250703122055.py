@@ -16,7 +16,7 @@ app = Flask(__name__)
 from openai import OpenAI
 client = OpenAI(
     base_url="http://localhost:8003/v1",
-    api_key="EMPYT", # 随便填写，只是为了通过接口参数
+    api_key="EMPYT", # 随便填写，只是为了通过接口参数校验
 )
 
 ###绑定配置文件
