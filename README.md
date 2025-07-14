@@ -1,3 +1,8 @@
 # FoodSky
 
-this is a test
+------
+## quick start
+
+python foodsky.py
+
+python run.py
