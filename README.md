@@ -1,8 +1,12 @@
-# FoodSky
+# FoodSky_demo
 
-------
-## quick start
+----
+## Quick Start
 
 python foodsky.py
 
 python run.py
+
+----
+
+demo results in logs/app_log.log
