@@ -407,17 +407,18 @@ def generate_all_dishes_reasons(dishes_info, meal_needs, weights, user_info, mea
 ## 用户基本信息:
 {json.dumps(user_info, indent=2, ensure_ascii=False)}
 
-### 用户单餐营养需求(注意是用户整餐营养总需求，不是每道菜的营养范围):
+### 用户单餐营养需求(注意是用户整餐营养总需求，不是每道菜的范围):
 {format_nutrition_table(meal_needs, is_range=True)}
 
-## 每道菜的营养信息以及权重（权重高表示推荐，权重低表示不推荐）:
+## 每道菜的营养信息以及权重（0表示不推荐，1表示强烈推荐）:
 {format_dishes_table(dishes_info)}
 
 
 ## 任务要求：
-1. 请严格根据推荐权重判断是否推荐，解释推荐和不推荐的原因
-2. 推荐菜品的总营养值不能超过用户单餐营养需求
-3. 理由避免重复描述，突出每道菜独特营养价值
+1. 请严格根据推荐权重判断是否推荐，并非所有菜品
+2. 权重高表示推荐，低表示不推荐
+3. 推荐菜品的总营养值不能超过用户单餐营养需求
+4. 理由避免重复描述，突出每道菜独特营养价值
 
 
 ## 所有的输出内容，格式都使用JSON格式

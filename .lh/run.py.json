@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 2,
+            "activePatchIndex": 5,
             "patches": [
                 {
                     "date": 1752214299608,
@@ -16,6 +16,18 @@
                 {
                     "date": 1752214314572,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -101,6 +101,6 @@\n port = '5000'\n url = f\"{ip_address}:{port}/recommend_dishes\"\n response = requests.post(url, json=test_data)\n \n-print('')\n+print('ok.....')\n # print(\"response\",response.json())\n"
+                },
+                {
+                    "date": 1752218061559,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -99,8 +99,38 @@\n         }\n ip_address = 'http://192.168.99.55'\n port = '5000'\n url = f\"{ip_address}:{port}/recommend_dishes\"\n-response = requests.post(url, json=test_data)\n+try:\n+    start_time = time.time()\n+    \n+    # 设置超时和异常处理\n+    response = requests.post(url, json=test_data, timeout=120)\n+    \n+    end_time = time.time()\n+    print(f\"请求耗时: {end_time - start_time:.2f}秒\")\n+    \n+    if response.status_code == 200:\n+        result = response.json()\n+        if result.get('success'):\n+            print(\"推荐结果获取成功！\")\n+            # 简略打印重要结果\n+            recommendations = result['result']['菜品推荐']\n+            print(f\"\\n餐别: {result['result']['餐别']}\")\n+            print(\"=\"*50)\n+            for dish in recommendations:\n+                print(f\"菜品: {dish['菜品名称']}\")\n+                print(f\"权重: {dish['推荐权重']:.2f} ({dish['推荐程度']})\")\n+                print(f\"原因: {dish['原因']}\")\n+                print(\"-\"*50)\n+        else:\n+            print(f\"服务返回错误: {result.get('error', '未知错误')}\")\n+    else:\n+        print(f\"请求失败, 状态码: {response.status_code}\")\n+        print(f\"错误信息: {response.text}\")\n \n-print('ok.....')\n-# print(\"response\",response.json())\n+except requests.exceptions.Timeout:\n+    print(\"请求超时，可能是菜品数量过多或服务器繁忙\")\n+except requests.exceptions.ConnectionError:\n+    print(\"连接失败，请检查IP地址和端口\")\n+except Exception as e:\n+    print(f\"未知错误: {str(e)}\")\n"
+                },
+                {
+                    "date": 1752218073453,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,7 @@\n import requests    \n+import time\n+\n test_data = {\n         \"flag\": 0, \n         \"info\": {\n             '性别': \"男\",\n"
+                },
+                {
+                    "date": 1752224080684,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -115,9 +115,9 @@\n         result = response.json()\n         if result.get('success'):\n             print(\"推荐结果获取成功！\")\n             # 简略打印重要结果\n-            recommendations = result['result']['菜品推荐']\n+            recommendations = sorted(result['result']['菜品推荐'], key=lambda x: -x['推荐权重'])\n             print(f\"\\n餐别: {result['result']['餐别']}\")\n             print(\"=\"*50)\n             for dish in recommendations:\n                 print(f\"菜品: {dish['菜品名称']}\")\n"
                 }
             ],
             "date": 1752214299608,

@@ -1,6 +1,4 @@
 import requests    
-import time
-
 test_data = {
         "flag": 0, 
         "info": {
@@ -116,7 +114,7 @@ try:
         if result.get('success'):
             print("推荐结果获取成功！")
             # 简略打印重要结果
-            recommendations = sorted(result['result']['菜品推荐'], key=lambda x: -x['推荐权重'])
+            recommendations = result['result']['菜品推荐']
             print(f"\n餐别: {result['result']['餐别']}")
             print("="*50)
             for dish in recommendations:
