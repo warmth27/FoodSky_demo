@@ -402,7 +402,7 @@ def generate_all_dishes_reasons(dishes_info, meal_needs, weights, user_info, mea
 
     # 准备提示词
     prompt = f"""
-
+你是一位专业的营养师，请根据以下信息，为用户的每道菜品生成推荐或不推荐理由。
 
 ## 用户基本信息:
 {json.dumps(user_info, indent=2, ensure_ascii=False)}
@@ -431,7 +431,7 @@ def generate_all_dishes_reasons(dishes_info, meal_needs, weights, user_info, mea
         response = client.chat.completions.create(
             model="FoodSky-7B-Qwen",
             messages=[
-                {"role": "system", "content": "你是一位专业的营养师，请根据以下信息，为用户的每道菜品生成推荐或不推荐理由。"},
+                {"role": "system", "content": "你是FoodSky，由中科深健研发的食品大模型"},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=800,

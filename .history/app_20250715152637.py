@@ -19,62 +19,62 @@ st.markdown("""
 <style>
 /* 在现有CSS样式部分添加/修改以下内容 */
 
-    .recommendation-card {
-        border-radius: 12px;
-        padding: 15px;
-        margin-bottom: 15px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        background: white; /* 默认背景色 */
-    }
+.recommendation-card {
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    background: white; /* 默认背景色 */
+}
 
-    /* 强烈推荐 - 内部背景为浅绿色 */
-    .high-weight {
-        background-color: #E8F5E9 !important; /* 非常浅的绿色 */
-        border: 2px solid #4CAF50; /* 外边框为绿色 */
-        border-left: 6px solid #4CAF50; /* 左侧条保留 */
-    }
+/* 强烈推荐 - 内部背景为浅绿色 */
+.high-weight {
+    background-color: #E8F5E9 !important; /* 非常浅的绿色 */
+    border: 2px solid #4CAF50; /* 外边框为绿色 */
+    border-left: 6px solid #4CAF50; /* 左侧条保留 */
+}
 
-    /* 推荐 - 内部背景为浅黄色 */
-    .medium-weight {
-        background-color: #FFFDE7 !important; /* 非常浅的黄色 */
-        border: 2px solid #FFC107; /* 外边框为黄色 */
-        border-left: 6px solid #FFC107; /* 左侧条保留 */
-    }
+/* 推荐 - 内部背景为浅黄色 */
+.medium-weight {
+    background-color: #FFFDE7 !important; /* 非常浅的黄色 */
+    border: 2px solid #FFC107; /* 外边框为黄色 */
+    border-left: 6px solid #FFC107; /* 左侧条保留 */
+}
 
-    /* 少量尝试 - 内部背景为浅红色 */
-    .low-weight {
-        background-color: #FFEBEE !important; /* 非常浅的红色 */
-        border: 2px solid #F44336; /* 外边框为红色 */
-        border-left: 6px solid #F44336; /* 左侧条保留 */
-    }
+/* 少量尝试 - 内部背景为浅红色 */
+.low-weight {
+    background-color: #FFEBEE !important; /* 非常浅的红色 */
+    border: 2px solid #F44336; /* 外边框为红色 */
+    border-left: 6px solid #F44336; /* 左侧条保留 */
+}
 
-    /* 悬停效果 */
-    .recommendation-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-    }
+/* 悬停效果 */
+.recommendation-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
 
-    /* 强烈推荐悬停时背景加深 */
-    .high-weight:hover {
-        background-color: #C8E6C9 !important;
-    }
+/* 强烈推荐悬停时背景加深 */
+.high-weight:hover {
+    background-color: #C8E6C9 !important;
+}
 
-    /* 推荐悬停时背景加深 */
-    .medium-weight:hover {
-        background-color: #FFECB3 !important;
-    }
+/* 推荐悬停时背景加深 */
+.medium-weight:hover {
+    background-color: #FFECB3 !important;
+}
 
-    /* 少量尝试悬停时背景加深 */
-    .low-weight:hover {
-        background-color: #FFCDD2 !important;
-    }
+/* 少量尝试悬停时背景加深 */
+.low-weight:hover {
+    background-color: #FFCDD2 !important;
+}
 
-    /* 标题颜色增强 */
-    .recommendation-card h3 {
-        color: #333; /* 深灰色增强可读性 */
-        margin-top: 0;
-    }
+/* 标题颜色增强 */
+.recommendation-card h3 {
+    color: #333; /* 深灰色增强可读性 */
+    margin-top: 0;
+}
     .nutrient-bar {
         height: 10px;
         background-color: #f0f0f0;

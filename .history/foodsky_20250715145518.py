@@ -402,7 +402,7 @@ def generate_all_dishes_reasons(dishes_info, meal_needs, weights, user_info, mea
 
     # 准备提示词
     prompt = f"""
-
+你是一位专业的营养师，请根据以下信息，为用户的每道菜品生成推荐或不推荐理由。
 
 ## 用户基本信息:
 {json.dumps(user_info, indent=2, ensure_ascii=False)}
@@ -410,14 +410,14 @@ def generate_all_dishes_reasons(dishes_info, meal_needs, weights, user_info, mea
 ### 用户整餐营养上限:
 {format_nutrition_table(meal_needs, is_range=True)}
 
-## 每道菜的营养信息以及权重（权重高表示推荐，权重低表示不推荐，权重范围为0-1）:
+## 每道菜的营养信息以及权重（权重高表示推荐，权重低表示不推荐）:
 {format_dishes_table(dishes_info)}
 
 
 ## 任务要求：
 1. 请严格根据用户整餐营养上限和每道菜的营养信息以及权重判断是否推荐，解释推荐和不推荐的原因
 2. 推荐菜品的总营养值不能超过用户整餐营养上限
-3. 理由避免重复描述，突出每道菜独特营养价值
+3. 注意最终推荐结果需要与权重保持一致。
 
 
 ## 所有的输出内容都使用JSON格式，严格按照以下输出示例格式：
@@ -431,11 +431,11 @@ def generate_all_dishes_reasons(dishes_info, meal_needs, weights, user_info, mea
         response = client.chat.completions.create(
             model="FoodSky-7B-Qwen",
             messages=[
-                {"role": "system", "content": "你是一位专业的营养师，请根据以下信息，为用户的每道菜品生成推荐或不推荐理由。"},
+                {"role": "system", "content": "你是FoodSky，由中科深健研发的食品大模型"},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=800,
-            temperature=1.0,
+            max_tokens=1000,
+            temperature=0.8,
             response_format="json"
         )
 
