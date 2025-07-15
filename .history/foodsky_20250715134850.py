@@ -522,7 +522,7 @@ class DishOptimizer:
                 meal_needs[nutrient] = (value * meal_ratio * 0.9, value * meal_ratio * 1.1)  # 缩放0.9-1.1，避免无解
             elif isinstance(value, str) and '-' in value:
                 low, high = map(float, value.split('-'))
-                meal_needs[nutrient] = (low * meal_ratio * 0.9, high * meal_ratio * 1.1)
+                meal_needs[nutrient] = (low * meal_ratio, high * meal_ratio)
             else:
                 meal_needs[nutrient] = (0, float('inf'))
 
@@ -586,7 +586,7 @@ class DishOptimizer:
             if min_val > 0:
                 prob += weighted_sum >= min_val * 0.9, f"{nutrient}_min"
             if max_val < float('inf'):
-                prob += weighted_sum <= max_val * 1.1, f"{nutrient}_max"
+                prob += weighted_sum <= max_val * 1.2, f"{nutrient}_max"
                 
         # 添加微量营养素约束（宽松约束）
         micronutrients = ["钙", "铁", "维生素C", "维生素A"]
@@ -604,8 +604,8 @@ class DishOptimizer:
                 nutrient_values = [dish.get(nutrient, 0) for dish in dish_nutritions]
                 weighted_sum = pulp.lpDot(weights, nutrient_values)
                 # 允许10%的偏差
-                prob += weighted_sum >= min_val * 0.8, f"{nutrient}_min_relaxed"
-                prob += weighted_sum <= max_val * 1.2, f"{nutrient}_max_relaxed"
+                prob += weighted_sum >= min_val * 0.9, f"{nutrient}_min_relaxed"
+                prob += weighted_sum <= max_val * 1.1, f"{nutrient}_max_relaxed"
         
         # 添加权重总和约束（至少选择70%菜品）
         prob += pulp.lpSum(weights) >= 0.7, "Min_70_Percent"

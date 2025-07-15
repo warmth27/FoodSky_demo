@@ -8,7 +8,7 @@ from datetime import datetime
 
 # 设置页面配置
 st.set_page_config(
-    page_title="中科深健智能菜品推荐系统",
+    page_title="智能菜品推荐系统",
     page_icon="🍲",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -97,18 +97,14 @@ st.markdown("""
         border-bottom: none;
         font-weight: bold;
     }
-    .dataframe-container {
-        width: 100%;
-        overflow-x: auto;
-    }
 </style>
 """, unsafe_allow_html=True)
 
 # 应用标题
 st.markdown("""
 <div class="header">
-    <h1 style="text-align:center; margin:0;">🍲 中科深健智能菜品推荐系统</h1>
-    <p style="text-align:center; margin:0; opacity:0.9;">基于营养学与FoodSky大模型的个性化菜品推荐</p>
+    <h1 style="text-align:center; margin:0;">🍲 智能菜品推荐系统</h1>
+    <p style="text-align:center; margin:0; opacity:0.9;">基于营养学与AI的个性化菜品推荐</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -158,9 +154,9 @@ def remove_dish(index):
 
 # 活动水平映射
 ACTIVITY_MAPPING = {
-    "轻活动水平": "a",
-    "中活动水平": "b",
-    "重活动水平": "c"
+    "轻活动水平(办公室工作，很少运动)": "a",
+    "中活动水平(每天适量运动)": "b",
+    "重活动水平(体力劳动或高强度训练)": "c"
 }
 
 # 提交表单
@@ -267,7 +263,7 @@ for i, dish in enumerate(st.session_state.dishes):
             min_value=1.0, 
             value=dish["weight"], 
             key=f"dish_weight_{i}", 
-            step=10.0
+            step=1.0
         )
     with col2:
         if i > 0:
@@ -417,9 +413,7 @@ if st.session_state.recommendations:
             
             # 创建DataFrame
             df_needs = pd.DataFrame.from_dict(formatted_needs, orient="index", columns=["值"])
-            st.markdown("<div class='dataframe-container'>", unsafe_allow_html=True)
-            st.dataframe(df_needs)
-            st.markdown("</div>", unsafe_allow_html=True)
+            st.dataframe(df_needs, use_container_width=True)
         else:
             st.warning("无用户营养需求数据")
         
@@ -432,9 +426,7 @@ if st.session_state.recommendations:
                     "推荐权重": dish.get("推荐权重", 0),
                     "原因": dish.get("原因", "")
                 })
-            st.markdown("<div class='dataframe-container'>", unsafe_allow_html=True)
-            st.dataframe(pd.DataFrame(dish_data))
-            st.markdown("</div>", unsafe_allow_html=True)
+            st.dataframe(pd.DataFrame(dish_data), use_container_width=True)
         else:
             st.warning("无菜品推荐数据")
         
@@ -454,9 +446,7 @@ if st.session_state.recommendations:
                     formatted_total[nutrient] = str(value)
             
             df_total = pd.DataFrame.from_dict(formatted_total, orient="index", columns=["值"])
-            st.markdown("<div class='dataframe-container'>", unsafe_allow_html=True)
-            st.dataframe(df_total)
-            st.markdown("</div>", unsafe_allow_html=True)
+            st.dataframe(df_total, use_container_width=True)
         else:
             st.warning("无整餐营养摘要数据")
     

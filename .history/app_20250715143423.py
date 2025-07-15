@@ -107,8 +107,8 @@ st.markdown("""
 # 应用标题
 st.markdown("""
 <div class="header">
-    <h1 style="text-align:center; margin:0;">🍲 中科深健智能菜品推荐系统</h1>
-    <p style="text-align:center; margin:0; opacity:0.9;">基于营养学与FoodSky大模型的个性化菜品推荐</p>
+    <h1 style="text-align:center; margin:0;">🍲 中科神剑智能菜品推荐系统</h1>
+    <p style="text-align:center; margin:0; opacity:0.9;">基于营养学与AI的个性化菜品推荐</p>
 </div>
 """, unsafe_allow_html=True)
 

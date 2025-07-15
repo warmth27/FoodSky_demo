@@ -8,7 +8,7 @@ from datetime import datetime
 
 # 设置页面配置
 st.set_page_config(
-    page_title="中科深健智能菜品推荐系统",
+    page_title="智能菜品推荐系统",
     page_icon="🍲",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -77,38 +77,14 @@ st.markdown("""
     .hidden-label label {
         display: none;
     }
-    .tab-content {
-        padding: 15px;
-        border: 1px solid #e0e0e0;
-        border-radius: 0 0 12px 12px;
-        border-top: none;
-        margin-top: -10px;
-    }
-    .tab-button {
-        padding: 10px 20px;
-        border: 1px solid #e0e0e0;
-        border-radius: 12px 12px 0 0;
-        background-color: #f0f0f0;
-        cursor: pointer;
-        margin-right: 5px;
-    }
-    .tab-button.active {
-        background-color: #fff;
-        border-bottom: none;
-        font-weight: bold;
-    }
-    .dataframe-container {
-        width: 100%;
-        overflow-x: auto;
-    }
 </style>
 """, unsafe_allow_html=True)
 
 # 应用标题
 st.markdown("""
 <div class="header">
-    <h1 style="text-align:center; margin:0;">🍲 中科深健智能菜品推荐系统</h1>
-    <p style="text-align:center; margin:0; opacity:0.9;">基于营养学与FoodSky大模型的个性化菜品推荐</p>
+    <h1 style="text-align:center; margin:0;">🍲 智能菜品推荐系统</h1>
+    <p style="text-align:center; margin:0; opacity:0.9;">基于营养学与AI的个性化菜品推荐</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -144,8 +120,6 @@ if 'response_time' not in st.session_state:
     st.session_state.response_time = None
 if 'selected_dish' not in st.session_state:
     st.session_state.selected_dish = None
-if 'active_tab' not in st.session_state:
-    st.session_state.active_tab = "菜品推荐"
 
 # 添加菜品
 def add_dish():
@@ -158,9 +132,9 @@ def remove_dish(index):
 
 # 活动水平映射
 ACTIVITY_MAPPING = {
-    "轻活动水平": "a",
-    "中活动水平": "b",
-    "重活动水平": "c"
+    "轻活动水平(办公室工作，很少运动)": "a",
+    "中活动水平(每天适量运动)": "b",
+    "重活动水平(体力劳动或高强度训练)": "c"
 }
 
 # 提交表单
@@ -247,7 +221,7 @@ with st.sidebar:
 # 主内容区
 st.markdown("### 🍽️ 菜品信息")
 
-# 菜品输入部分
+# 菜品输入部分 - 避免嵌套列
 for i, dish in enumerate(st.session_state.dishes):
     st.markdown(f"**菜品 #{i+1}**")
     
@@ -259,15 +233,15 @@ for i, dish in enumerate(st.session_state.dishes):
         placeholder="例如: 番茄炒蛋"
     )
     
-    # 重量输入和删除按钮
-    col1, col2 = st.columns([3, 1])
+    # 重量输入和删除按钮 - 使用水平布局但避免嵌套列
+    col1, col2 = st.beta_columns([3, 1])
     with col1:
         dish["weight"] = st.number_input(
             "重量 (g)", 
             min_value=1.0, 
             value=dish["weight"], 
             key=f"dish_weight_{i}", 
-            step=10.0
+            step=1.0
         )
     with col2:
         if i > 0:
@@ -286,15 +260,15 @@ if st.button("✨ 生成菜品推荐", key="generate_recommendation"):
         else:
             st.session_state.recommendations = None
 
-# 推荐结果显示
+# 推荐结果显示 - 避免嵌套列
 if st.session_state.recommendations:
     recommendations = st.session_state.recommendations
     st.markdown("### 📊 推荐结果")
     st.caption(f"请求时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | 响应时间: {st.session_state.response_time:.2f}秒")
     
     # 基本信息卡片
-    with st.expander("📋 基本信息摘要", expanded=True):
-        col1, col2 = st.columns(2)
+    with st.beta_expander("📋 基本信息摘要", expanded=True):
+        col1, col2 = st.beta_columns(2)
         with col1:
             st.metric("餐别", recommendations.get("餐别", "午餐"))
             st.metric("状态", recommendations.get("求解状态", "未知"))
@@ -307,19 +281,10 @@ if st.session_state.recommendations:
                 energy_range = "未知"
             st.metric("能量需求范围", energy_range)
     
-    # 自定义标签页实现
-    tabs = ["菜品推荐", "营养分析", "详情数据"]
-    tab_buttons = st.columns(len(tabs))
-    
-    for i, tab in enumerate(tabs):
-        with tab_buttons[i]:
-            if st.button(tab, key=f"tab_{i}"):
-                st.session_state.active_tab = tab
-    
-    st.markdown(f"<div class='tab-content'>", unsafe_allow_html=True)
-    
     # 菜品推荐标签页
-    if st.session_state.active_tab == "菜品推荐":
+    tab1, tab2, tab3 = st.beta_tabs(["菜品推荐", "营养分析", "详情数据"])
+    
+    with tab1:
         st.markdown("#### 📋 菜品推荐列表")
         
         # 排序：按权重降序
@@ -349,8 +314,8 @@ if st.session_state.recommendations:
             
             nutrition = dish.get("营养值", {})
             if nutrition:
-                with st.expander("📊 营养成分分析", expanded=False):
-                    col1, col2, col3 = st.columns(3)
+                with st.beta_expander("📊 营养成分分析", expanded=False):
+                    col1, col2, col3 = st.beta_columns(3)
                     with col1:
                         st.metric("能量", f"{nutrition.get('能量', 0):.1f} kcal")
                         st.metric("蛋白质", f"{nutrition.get('蛋白质', 0):.1f} g")
@@ -362,8 +327,7 @@ if st.session_state.recommendations:
                         st.metric("维生素C", f"{nutrition.get('维生素C', 0):.1f} mg")
             st.markdown("</div>", unsafe_allow_html=True)
     
-    # 营养分析标签页
-    elif st.session_state.active_tab == "营养分析":
+    with tab2:
         st.markdown("#### 📊 营养分析")
         
         user_needs = recommendations.get("用户营养需求", {})
@@ -371,7 +335,7 @@ if st.session_state.recommendations:
         
         if total_nutrition and user_needs:
             st.markdown("##### 🍽️ 整餐营养摘要")
-            col1, col2 = st.columns(2)
+            col1, col2 = st.beta_columns(2)
             
             with col1:
                 st.metric("总能量", f"{total_nutrition.get('能量', 0):.1f} kcal")
@@ -396,30 +360,13 @@ if st.session_state.recommendations:
             df_micro = pd.DataFrame({"营养素": micro_nutrients, "含量": micro_values})
             st.bar_chart(df_micro.set_index("营养素"))
     
-    # 详情数据标签页 - 修复了ValueError错误
-    elif st.session_state.active_tab == "详情数据":
+    with tab3:
         st.markdown("#### 📊 详情数据")
         
         st.markdown("##### 用户需求营养范围")
         if recommendations.get("用户营养需求"):
-            # 创建格式化后的营养需求字典
-            formatted_needs = {}
-            for nutrient, value in recommendations["用户营养需求"].items():
-                # 处理范围值
-                if isinstance(value, (list, tuple)) and len(value) == 2:
-                    formatted_needs[nutrient] = f"{value[0]:.1f}-{value[1]:.1f}"
-                # 处理单个值
-                elif isinstance(value, (int, float)):
-                    formatted_needs[nutrient] = f"{value:.1f}"
-                # 处理其他类型
-                else:
-                    formatted_needs[nutrient] = str(value)
-            
-            # 创建DataFrame
-            df_needs = pd.DataFrame.from_dict(formatted_needs, orient="index", columns=["值"])
-            st.markdown("<div class='dataframe-container'>", unsafe_allow_html=True)
+            df_needs = pd.DataFrame.from_dict(recommendations["用户营养需求"], orient="index", columns=["值"])
             st.dataframe(df_needs)
-            st.markdown("</div>", unsafe_allow_html=True)
         else:
             st.warning("无用户营养需求数据")
         
@@ -432,35 +379,16 @@ if st.session_state.recommendations:
                     "推荐权重": dish.get("推荐权重", 0),
                     "原因": dish.get("原因", "")
                 })
-            st.markdown("<div class='dataframe-container'>", unsafe_allow_html=True)
             st.dataframe(pd.DataFrame(dish_data))
-            st.markdown("</div>", unsafe_allow_html=True)
         else:
             st.warning("无菜品推荐数据")
         
         st.markdown("##### 整餐营养摘要")
         if recommendations.get("整餐营养摘要"):
-            # 创建格式化后的营养摘要字典
-            formatted_total = {}
-            for nutrient, value in recommendations["整餐营养摘要"].items():
-                # 处理范围值
-                if isinstance(value, (list, tuple)) and len(value) == 2:
-                    formatted_total[nutrient] = f"{value[0]:.1f}-{value[1]:.1f}"
-                # 处理单个值
-                elif isinstance(value, (int, float)):
-                    formatted_total[nutrient] = f"{value:.1f}"
-                # 处理其他类型
-                else:
-                    formatted_total[nutrient] = str(value)
-            
-            df_total = pd.DataFrame.from_dict(formatted_total, orient="index", columns=["值"])
-            st.markdown("<div class='dataframe-container'>", unsafe_allow_html=True)
+            df_total = pd.DataFrame.from_dict(recommendations["整餐营养摘要"], orient="index", columns=["值"])
             st.dataframe(df_total)
-            st.markdown("</div>", unsafe_allow_html=True)
         else:
             st.warning("无整餐营养摘要数据")
-    
-    st.markdown("</div>", unsafe_allow_html=True)
 else:
     st.info("✨ 请填写个人信息并点击'生成菜品推荐'按钮获取个性化推荐")
 

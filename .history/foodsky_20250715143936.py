@@ -522,7 +522,7 @@ class DishOptimizer:
                 meal_needs[nutrient] = (value * meal_ratio * 0.9, value * meal_ratio * 1.1)  # 缩放0.9-1.1，避免无解
             elif isinstance(value, str) and '-' in value:
                 low, high = map(float, value.split('-'))
-                meal_needs[nutrient] = (low * meal_ratio * 0.9, high * meal_ratio * 1.1)
+                meal_needs[nutrient] = (low * meal_ratio * 0., high * meal_ratio)
             else:
                 meal_needs[nutrient] = (0, float('inf'))
 

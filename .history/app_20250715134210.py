@@ -8,7 +8,7 @@ from datetime import datetime
 
 # 设置页面配置
 st.set_page_config(
-    page_title="中科深健智能菜品推荐系统",
+    page_title="智能菜品推荐系统",
     page_icon="🍲",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -107,8 +107,8 @@ st.markdown("""
 # 应用标题
 st.markdown("""
 <div class="header">
-    <h1 style="text-align:center; margin:0;">🍲 中科深健智能菜品推荐系统</h1>
-    <p style="text-align:center; margin:0; opacity:0.9;">基于营养学与FoodSky大模型的个性化菜品推荐</p>
+    <h1 style="text-align:center; margin:0;">🍲 智能菜品推荐系统</h1>
+    <p style="text-align:center; margin:0; opacity:0.9;">基于营养学与AI的个性化菜品推荐</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -160,7 +160,7 @@ def remove_dish(index):
 ACTIVITY_MAPPING = {
     "轻活动水平": "a",
     "中活动水平": "b",
-    "重活动水平": "c"
+    "重活动水平(体力劳动或高强度训练)": "c"
 }
 
 # 提交表单
@@ -267,7 +267,7 @@ for i, dish in enumerate(st.session_state.dishes):
             min_value=1.0, 
             value=dish["weight"], 
             key=f"dish_weight_{i}", 
-            step=10.0
+            step=1.0
         )
     with col2:
         if i > 0:
