@@ -3,9 +3,10 @@
 ----
 ## Quick Start
 
-python foodsky.py
+-  python foodsky.py     ---->    python run.py
+-  python foodsky.py     ---->    streamlit run app.py
 
-python run.py
+
 
 ----
 
