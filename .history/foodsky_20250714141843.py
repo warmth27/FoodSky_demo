@@ -417,12 +417,12 @@ def generate_all_dishes_reasons(dishes_info, meal_needs, weights, user_info, mea
 ## 任务要求：
 1. 请严格根据用户整餐营养上限和每道菜的营养信息以及权重判断是否推荐，解释推荐和不推荐的原因
 2. 推荐菜品的总营养值不能超过用户整餐营养上限
-3. 注意你最终推荐的菜品会成为用户的餐食，注意用户的餐食营养需求
+3. 原因避免重复描述，突出每道菜独特营养价值
 
 
-## 所有的输出内容都使用JSON格式，严格按照以下输出示例格式：
+## 输出示例
 {{
-    "菜品名称": "是否推荐|详细原因",
+    "菜品名称": "是否推荐",
 }}
 """
 
@@ -434,8 +434,8 @@ def generate_all_dishes_reasons(dishes_info, meal_needs, weights, user_info, mea
                 {"role": "system", "content": "你是FoodSky，由中科深健研发的食品大模型"},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=1000,
-            temperature=0.8,
+            max_tokens=800,
+            temperature=0.3,
             response_format="json"
         )
 
