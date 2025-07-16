@@ -410,12 +410,12 @@ def generate_all_dishes_reasons(dishes_info, meal_needs, weights, user_info, mea
 ### 用户整餐营养上限:
 {format_nutrition_table(meal_needs, is_range=True)}
 
-## 每道菜的营养信息以及权重（权重高表示推荐，权重小于0.3表示不推荐，）:
+## 每道菜的营养信息以及权重:
 {format_dishes_table(dishes_info)}
 
 
 ## 任务要求：
-1. 请严格根据权重判断是否推荐，解释推荐和不推荐的原因
+1. 请严格根据权重判断是否推荐，权重高表示推荐，权重低表示不推荐，权重范围为0-1,解释推荐和不推荐的原因
 2. 推荐菜品的总营养值不能超过用户整餐营养上限
 3. 理由避免重复描述，突出每道菜独特营养价值
 

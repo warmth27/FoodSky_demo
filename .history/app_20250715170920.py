@@ -266,7 +266,7 @@ def call_backend_service():
 
 # 左侧栏 - 用户信息输入
 with st.sidebar:
-    st.markdown("### 个人信息 Personal Info")
+    st.markdown("###  个人信息")
     st.selectbox("性别", ["男", "女"], key="gender", index=0)
     st.number_input("年龄", min_value=1, max_value=120, key="age", value=20)
     st.number_input("身高 (cm)", min_value=50.0, max_value=250.0, key="height", value=175.0, step=1.0)
@@ -379,7 +379,7 @@ if st.session_state.recommendations:
                 card_class = "low-weight"
                 recommendation_text = "少量尝试"
             
-            # st.markdown(f"<div class='recommendation-card {card_class}'>", unsafe_allow_html=True)
+            st.markdown(f"<div class='recommendation-card {card_class}'>", unsafe_allow_html=True)
             st.markdown(f"#### 🍲 {dish.get('菜品名称', '未知菜品')}")
             st.markdown(f"**推荐指数**: {weight:.2f} ({recommendation_text})")
             st.markdown(f"**原因**: {dish.get('原因', '暂无推荐理由')}")

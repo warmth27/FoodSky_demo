@@ -410,7 +410,7 @@ def generate_all_dishes_reasons(dishes_info, meal_needs, weights, user_info, mea
 ### 用户整餐营养上限:
 {format_nutrition_table(meal_needs, is_range=True)}
 
-## 每道菜的营养信息以及权重（权重高表示推荐，权重小于0.3表示不推荐，）:
+## 每道菜的营养信息以及权重（权重高表示推荐，权重低表示不推荐，权重范围为0-1）:
 {format_dishes_table(dishes_info)}
 
 
