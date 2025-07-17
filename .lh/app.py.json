@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 69,
+            "activePatchIndex": 70,
             "patches": [
                 {
                     "date": 1752476972049,
@@ -284,6 +284,10 @@
                 {
                     "date": 1752632657672,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -378,9 +378,9 @@\n             else:\n                 card_class = \"low-weight\"\n                 recommendation_text = \"少量尝试\"\n             \n-            st.markdown(f\"<div class='recommendation-card {card_class}'>\", unsafe_allow_html=True)\n+            # st.markdown(f\"<div class='recommendation-card {card_class}'>\", unsafe_allow_html=True)\n             st.markdown(f\"#### 🍲 {dish.get('菜品名称', '未知菜品')}\")\n             st.markdown(f\"**推荐指数**: {weight:.2f} ({recommendation_text})\")\n             st.markdown(f\"**原因**: {dish.get('原因', '暂无推荐理由')}\")\n             \n"
+                },
+                {
+                    "date": 1752715706872,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -503,9 +503,9 @@\n \n # 使用说明\n st.markdown(\"---\")\n st.markdown(\"\"\"\n-### 使用说明\n+#### 使用说明\n 1. 在左侧填写您的个人信息（性别、年龄、身高、体重等）\n 2. 添加您想评估的菜品（至少一个）\n 3. 点击\"生成菜品推荐\"按钮获取个性化推荐\n 4. 查看推荐结果，了解每道菜的推荐程度和原因\n"
                 }
             ],
             "date": 1752476972049,
