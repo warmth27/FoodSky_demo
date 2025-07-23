@@ -38,6 +38,8 @@ app.config.from_object(config)
 nutritionDataset_path = "/nfs/data/project/xcx_app_project/nutritionDatabase.json"
 recipeDataset_path = "/nfs/data/project/xcx_app_project/recipeDataset.json"
 nutri_range_Dataset_path = "/nfs/data/project/xcx_app_project/base_nutri_range.json"
+illness_principles_path = "/home/wth/FoodSky/diseaseDataset.json"
+
 
 with open(nutritionDataset_path,'r',encoding='utf-8')as f:
     nutritionDataset = json.load(f)
@@ -45,6 +47,8 @@ with open(recipeDataset_path,'r',encoding='utf-8')as f:
     recipeDataset = json.load(f)
 with open(nutri_range_Dataset_path,'r',encoding='utf-8')as f:
     nutriRangeDataset = json.load(f)
+with open(illness_principles_path, 'r', encoding='utf-8')as f:
+    illness_principles_data = json.load(f)
     
 #! 设置三餐比例
 scale = {"早餐": 0.3, "午餐": 0.4, "晚餐": 0.3}
@@ -99,6 +103,59 @@ def match_dish_name_bm25(query, dishes):
     scores = bm25.get_scores(query_tokens)
     return dishes[scores.argmax()]
 
+
+#! 基于BM25的疾病原则匹配
+def find_illness_principles(illness_list):
+    """根据疾病列表查找对应的营养治疗原则"""
+    principles = []
+    illness_list = illness_list or []
+    
+    # 收集所有营养治疗原则的名称和内容
+    all_principles = []
+    for disease_category, category_data in illness_principles_data.items():
+        for principle_name, principle_data in category_data.items():
+            if "营养治疗原则" in principle_name and "content" in principle_data:
+                all_principles.append({
+                    "name": principle_name,
+                    "content": principle_data["content"]
+                })
+    
+    # 准备BM25索引
+    principle_names = [p["name"] for p in all_principles]
+    tokenized_corpus = [list(jieba.cut(name)) for name in principle_names]
+    bm25 = BM25Okapi(tokenized_corpus)
+    
+    for illness in illness_list:
+        illness = illness.strip()
+        matched = False
+        matched_principle = None
+        best_score = 0
+        
+        # 方法1: BM25模糊匹配
+        query_tokens = list(jieba.cut(illness))
+        scores = bm25.get_scores(query_tokens)
+        best_index = scores.argmax()
+        best_score = scores[best_index]
+        
+        if best_score > 0:
+            matched_principle = all_principles[best_index]
+            matched = True
+        else:
+            # 方法2: 直接关键词匹配
+            for principle in all_principles:
+                if illness in principle["name"]:
+                    matched_principle = principle
+                    matched = True
+                    best_score = 10  # 设为较高值表示直接匹配
+                    break
+        
+        if matched and matched_principle:
+            principles.append(matched_principle["content"])
+            app_log.info(f"疾病名称匹配: '{illness}' -> '{matched_principle['name']}' (得分: {best_score:.2f})")
+        else:
+            app_log.warning(f"未找到疾病名称 '{illness}' 的匹配项")
+    
+    return "\n\n".join(principles) if principles else "用户无特定疾病营养治疗原则"
 
 #! 基于用户的年龄、性别等基本信息，计算用户的推荐营养范围
 def nutritionDataDict(age,gender,height,weight,activity_level):
@@ -298,7 +355,6 @@ def cal_food_nutri(all_food_name):
         food_name = each_food_dict["食品名称"]
         food_weight = each_food_dict["食品克数"]
         value = each_food_dict.get("食材信息")
-        
         # total_nutrition = {}
         # print("food_name",food_name)
         if isinstance(value, (dict, str)) and value:
@@ -313,8 +369,7 @@ def cal_food_nutri(all_food_name):
                     nutrition_cache[k] = matched_food_name
                 else:
                     matched_food_name = nutrition_cache[k]
-                
-                # print("matched_food_name", matched_food_name)
+                #print("matched_food_name", matched_food_name)
                 each_food_list.append([matched_food_name, float(v)])
             
             
@@ -399,28 +454,45 @@ def generate_all_dishes_reasons(dishes_info, meal_needs, weights, user_info, mea
     print(json.dumps(user_info, indent=2, ensure_ascii=False))
     print(format_nutrition_table(meal_needs, is_range=True))
     print(format_dishes_table(dishes_info))
+    
+    #? 获取用户疾病信息
+    illness_str = user_info.get("疾病情况") or "none"
+    if illness_str != "none":
+        # 先替换中文逗号为英文逗号
+        illness_str = illness_str.replace("，", ",")
+        # 然后按英文逗号分割
+        illness_list = illness_str.split(",")
+    else:
+        illness_list = []
+    
+    #? 基于疾病信息查找治疗原则
+    illness_principles = find_illness_principles(illness_list)
 
     # 准备提示词
     prompt = f"""
-## 用户基本信息:
-{json.dumps(user_info, indent=2, ensure_ascii=False)}
+    ## 用户基本信息:
+    {json.dumps(user_info, indent=2, ensure_ascii=False)}
 
-### 用户整餐营养上限:
-{format_nutrition_table(meal_needs, is_range=True)}
+    ### 用户整餐营养上限:
+    {format_nutrition_table(meal_needs, is_range=True)}
 
-## 每道菜的营养信息以及权重（权重高表示推荐，权重小于0.3表示不推荐，）:
-{format_dishes_table(dishes_info)}
+    ## 每道菜的营养信息以及权重（权重高表示推荐，权重小于0.3表示不推荐，）:
+    {format_dishes_table(dishes_info)}
+    
+    ## 用户疾病营养治疗原则:
+    {illness_principles}
 
-## 任务要求：
-1. 请严格根据权重判断是否推荐，解释推荐和不推荐的原因
-2. 推荐菜品的总营养值不能超过用户整餐营养上限
-3. 理由避免重复描述，突出每道菜独特营养价值
+    ## 任务要求：
+    1. 请严格根据权重判断是否推荐，解释推荐和不推荐的原因
+    2. 推荐菜品的总营养值不能超过用户整餐营养上限
+    3. 理由避免重复描述，突出每道菜独特营养价值
+    4. 严格注意用户疾病的营养治疗原则，避免推荐不合适的菜品
 
-## 所有的输出内容都使用JSON格式，严格按照以下输出示例格式：
-{{
-    "菜品名称": "是否推荐|详细原因",
-}}
-"""
+    ## 严格按照以下输出示例格式：
+    {{
+        "菜品名称": "是否推荐|详细原因",
+    }}
+    """
 
     try:
         # 调用大模型
@@ -430,7 +502,7 @@ def generate_all_dishes_reasons(dishes_info, meal_needs, weights, user_info, mea
                 {"role": "system", "content": "你是一位专业的营养师，请根据以下信息，为用户的每道菜品生成推荐或不推荐理由。"},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=800,
+            max_tokens=600,
             temperature=1.0,
             response_format="json"
         )
@@ -723,41 +795,41 @@ def recommend_dishes():
     json_data = request.get_json()
     app_log.info(f"[Recommend request] {json_data}")
     
-    try:
-        # 获取用户信息
-        user_info = json_data.get("info", {})
-        if not user_info:
-            return jsonify({"success": False, "error": "缺少用户信息"}), 400
-        
-        # 获取餐别
-        meal_type = json_data.get("data", {}).get("餐别", "午餐")
-        app_log.info(f"开始计算餐别 '{meal_type}' 的营养需求")
-        app_log.debug(f"用户信息: {user_info}")
-        
-        # 获取菜品列表
-        dish_list = json_data.get("data", {}).get("菜品名称", [])
-        app_log.debug(f"菜品数量: {len(dish_list)}")
-        
-        # 验证菜品格式
-        valid_dishes = [d for d in dish_list if validate_dish(d)]
-        if len(valid_dishes) != len(dish_list):
-            invalid_count = len(dish_list) - len(valid_dishes)
-            app_log.warning(f"发现无效菜品格式: {invalid_count}个")
-        
-        # 生成推荐
-        result = dish_optimizer.generate_recommendations(user_info, valid_dishes, meal_type)
-        
-        return jsonify({
-            "success": True,
-            "result": result
-        })
+    #try:
+    # 获取用户信息
+    user_info = json_data.get("info", {})
+    if not user_info:
+        return jsonify({"success": False, "error": "缺少用户信息"}), 400
     
-    except Exception as e:
-        app_log.error(f"[Recommend error] {str(e)}")
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+    # 获取餐别
+    meal_type = json_data.get("data", {}).get("餐别", "午餐")
+    app_log.info(f"开始计算餐别 '{meal_type}' 的营养需求")
+    app_log.debug(f"用户信息: {user_info}")
+    
+    # 获取菜品列表
+    dish_list = json_data.get("data", {}).get("菜品名称", [])
+    app_log.debug(f"菜品数量: {len(dish_list)}")
+    
+    # 验证菜品格式
+    valid_dishes = [d for d in dish_list if validate_dish(d)]
+    if len(valid_dishes) != len(dish_list):
+        invalid_count = len(dish_list) - len(valid_dishes)
+        app_log.warning(f"发现无效菜品格式: {invalid_count}个")
+    
+    # 生成推荐
+    result = dish_optimizer.generate_recommendations(user_info, valid_dishes, meal_type)
+    
+    return jsonify({
+        "success": True,
+        "result": result
+    })
+    
+    #except Exception as e:
+        #app_log.error(f"[Recommend error] {str(e)}")
+        #return jsonify({
+        #    "success": False,
+        #    "error": str(e)
+        #}), 500
 
 
 # 原有API端点保持不变

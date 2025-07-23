@@ -219,6 +219,7 @@ def submit_form():
 def call_backend_service():
     # 映射活动水平为简写形式
     activity_level = ACTIVITY_MAPPING[st.session_state.activity_level_label]
+    diseases = st.session_state.get("疾病情况", "")
     
     st.session_state.request_data = {
         "info": {
@@ -226,7 +227,8 @@ def call_backend_service():
             "年龄": st.session_state.age,
             "身高": st.session_state.height,
             "体重": st.session_state.weight,
-            "activity_level": activity_level
+            "activity_level": activity_level,
+            "疾病情况": diseases  # 添加疾病信息
         },
         "data": {
             "餐别": st.session_state.meal_type,
@@ -280,6 +282,16 @@ with st.sidebar:
     )
     
     st.selectbox("餐别", ["早餐", "午餐", "晚餐"], key="meal_type", index=1)
+    
+    # st.markdown("---")
+    st.markdown("### 🩺 健康信息")
+    
+    diseases = st.text_input(
+        "疾病情况",
+        key="疾病情况",
+        placeholder="例如: 高血压，或者无",
+        help="请输入您患有的疾病，没有可以不填写"
+    )
 
 # 主内容区
 st.markdown("### 🍽️ 菜品信息")
@@ -381,7 +393,7 @@ if st.session_state.recommendations:
             
             # st.markdown(f"<div class='recommendation-card {card_class}'>", unsafe_allow_html=True)
             st.markdown(f"#### 🍲 {dish.get('菜品名称', '未知菜品')}")
-            st.markdown(f"**推荐指数**: {weight:.2f} ({recommendation_text})")
+            st.markdown(f"**推荐指数**: {weight:.2f}")
             st.markdown(f"**原因**: {dish.get('原因', '暂无推荐理由')}")
             
             nutrition = dish.get("营养值", {})
@@ -466,7 +478,7 @@ if st.session_state.recommendations:
             for dish in recommendations["菜品推荐"]:
                 dish_data.append({
                     "菜品名称": dish.get("菜品名称", ""),
-                    "推荐权重": dish.get("推荐权重", 0),
+                    "推荐指数": dish.get("推荐权重", 0),
                     "原因": dish.get("原因", "")
                 })
             st.markdown("<div class='dataframe-container'>", unsafe_allow_html=True)
@@ -506,16 +518,17 @@ st.markdown("---")
 st.markdown("""
 #### 使用说明
 1. 在左侧填写您的个人信息（性别、年龄、身高、体重等）
-2. 添加您想评估的菜品（至少一个）
-3. 点击"生成菜品推荐"按钮获取个性化推荐
-4. 查看推荐结果，了解每道菜的推荐程度和原因
-
-**推荐权重说明**:
-- **强烈推荐 (权重 ≥ 0.7)**: 营养均衡且符合需求  
-- **推荐 (0.5 ≤ 权重 < 0.7)**: 营养良好，适合食用  
-- **适量食用 (0.3 ≤ 权重 < 0.5)**: 可以少量食用  
-- **少量尝试 (权重 < 0.3)**: 建议本餐避免或少量尝试
+2. 注意：如有多项疾病，请使用英文逗号分隔，例如：糖尿病,高血压
+3. 添加您想评估的菜品（至少一个）
+4. 点击"生成菜品推荐"按钮获取个性化推荐
+5. 查看推荐结果，了解每道菜的推荐程度和原因
 """)
+# **推荐权重说明**:
+# - **强烈推荐 (权重 ≥ 0.7)**: 营养均衡且符合需求  
+# - **推荐 (0.5 ≤ 权重 < 0.7)**: 营养良好，适合食用  
+# - **适量食用 (0.3 ≤ 权重 < 0.5)**: 可以少量食用  
+# - **少量尝试 (权重 < 0.3)**: 建议本餐避免或少量尝试
+
 
 # 调试信息（可选）
 if st.checkbox("显示调试信息"):
